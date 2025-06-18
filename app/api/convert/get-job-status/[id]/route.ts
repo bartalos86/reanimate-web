@@ -18,11 +18,11 @@ export async function GET(
             return new NextResponse("Unauthorized", { status: 401 });
         }
 
-        const jobId = params.id;
+        const { id } = await params;
 
         const job = await prisma.job.findUnique({
             where: {
-                id: jobId,
+                id: id,
             },
         });
 

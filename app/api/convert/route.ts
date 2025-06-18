@@ -126,6 +126,8 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         id: databaseJob.id,
+        automatic_metadata: metadataMode === "auto",
+        metadata
       }),
     });
 
