@@ -2,6 +2,7 @@
 import { Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ConversionBox } from "@/components/conversion/conversion-box";
+import ConversionProgressBox from "@/components/conversion/conversion-progress-box";
 
 export default function ConvertPage() {
   return (
@@ -16,6 +17,10 @@ export default function ConvertPage() {
             Transform your books into modern digital formats. Perfect for readers looking to enhance their reading experience.
           </p>
         </div>
+
+        <section className="flex justify-center">
+          <ConversionProgressBox></ConversionProgressBox>
+        </section>
 
         {/* Conversion Box */}
         <div className="flex justify-center">

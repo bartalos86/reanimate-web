@@ -38,12 +38,26 @@ export type PasswordResetToken = $Result.DefaultSelection<Prisma.$PasswordResetT
  * 
  */
 export type Job = $Result.DefaultSelection<Prisma.$JobPayload>
+/**
+ * Model BookMetadata
+ * 
+ */
+export type BookMetadata = $Result.DefaultSelection<Prisma.$BookMetadataPayload>
 
 /**
  * Enums
  */
 export namespace $Enums {
-  export const JobStatus: {
+  export const JobStage: {
+  OCR: 'OCR',
+  METADATA: 'METADATA',
+  CONVERSION: 'CONVERSION'
+};
+
+export type JobStage = (typeof JobStage)[keyof typeof JobStage]
+
+
+export const JobStatus: {
   PENDING: 'PENDING',
   PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
@@ -53,6 +67,10 @@ export namespace $Enums {
 export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
 
 }
+
+export type JobStage = $Enums.JobStage
+
+export const JobStage: typeof $Enums.JobStage
 
 export type JobStatus = $Enums.JobStatus
 
@@ -232,6 +250,16 @@ export class PrismaClient<
     * ```
     */
   get job(): Prisma.JobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.bookMetadata`: Exposes CRUD operations for the **BookMetadata** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BookMetadata
+    * const bookMetadata = await prisma.bookMetadata.findMany()
+    * ```
+    */
+  get bookMetadata(): Prisma.BookMetadataDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -676,7 +704,8 @@ export namespace Prisma {
     Account: 'Account',
     VerificationToken: 'VerificationToken',
     PasswordResetToken: 'PasswordResetToken',
-    Job: 'Job'
+    Job: 'Job',
+    BookMetadata: 'BookMetadata'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -695,7 +724,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "verificationToken" | "passwordResetToken" | "job"
+      modelProps: "user" | "account" | "verificationToken" | "passwordResetToken" | "job" | "bookMetadata"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1069,6 +1098,80 @@ export namespace Prisma {
           }
         }
       }
+      BookMetadata: {
+        payload: Prisma.$BookMetadataPayload<ExtArgs>
+        fields: Prisma.BookMetadataFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BookMetadataFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BookMetadataFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          findFirst: {
+            args: Prisma.BookMetadataFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BookMetadataFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          findMany: {
+            args: Prisma.BookMetadataFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>[]
+          }
+          create: {
+            args: Prisma.BookMetadataCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          createMany: {
+            args: Prisma.BookMetadataCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BookMetadataCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>[]
+          }
+          delete: {
+            args: Prisma.BookMetadataDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          update: {
+            args: Prisma.BookMetadataUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          deleteMany: {
+            args: Prisma.BookMetadataDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BookMetadataUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BookMetadataUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>[]
+          }
+          upsert: {
+            args: Prisma.BookMetadataUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BookMetadataPayload>
+          }
+          aggregate: {
+            args: Prisma.BookMetadataAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBookMetadata>
+          }
+          groupBy: {
+            args: Prisma.BookMetadataGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BookMetadataGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BookMetadataCountArgs<ExtArgs>
+            result: $Utils.Optional<BookMetadataCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1158,6 +1261,7 @@ export namespace Prisma {
     verificationToken?: VerificationTokenOmit
     passwordResetToken?: PasswordResetTokenOmit
     job?: JobOmit
+    bookMetadata?: BookMetadataOmit
   }
 
   /* Types for Logging */
@@ -1253,10 +1357,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     accounts: number
+    jobs: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+    jobs?: boolean | UserCountOutputTypeCountJobsArgs
   }
 
   // Custom InputTypes
@@ -1275,6 +1381,44 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AccountWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWhereInput
+  }
+
+
+  /**
+   * Count Type BookMetadataCountOutputType
+   */
+
+  export type BookMetadataCountOutputType = {
+    Job: number
+  }
+
+  export type BookMetadataCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Job?: boolean | BookMetadataCountOutputTypeCountJobArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * BookMetadataCountOutputType without action
+   */
+  export type BookMetadataCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadataCountOutputType
+     */
+    select?: BookMetadataCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * BookMetadataCountOutputType without action
+   */
+  export type BookMetadataCountOutputTypeCountJobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: JobWhereInput
   }
 
 
@@ -1513,6 +1657,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    jobs?: boolean | User$jobsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1555,6 +1700,7 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "password" | "image" | "credits" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
+    jobs?: boolean | User$jobsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1564,6 +1710,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
+      jobs: Prisma.$JobPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1970,6 +2117,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    jobs<T extends User$jobsArgs<ExtArgs> = {}>(args?: Subset<T, User$jobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2417,6 +2565,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[]
+  }
+
+  /**
+   * User.jobs
+   */
+  export type User$jobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Job
+     */
+    select?: JobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Job
+     */
+    omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    where?: JobWhereInput
+    orderBy?: JobOrderByWithRelationInput | JobOrderByWithRelationInput[]
+    cursor?: JobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobScalarFieldEnum | JobScalarFieldEnum[]
   }
 
   /**
@@ -5611,31 +5783,40 @@ export namespace Prisma {
   export type JobMinAggregateOutputType = {
     id: string | null
     status: $Enums.JobStatus | null
+    stage: $Enums.JobStage | null
     input_file_path: string | null
     output_file_path: string | null
     createdAt: Date | null
     completedAt: Date | null
     error_message: string | null
+    userId: string | null
+    bookMetadataId: string | null
   }
 
   export type JobMaxAggregateOutputType = {
     id: string | null
     status: $Enums.JobStatus | null
+    stage: $Enums.JobStage | null
     input_file_path: string | null
     output_file_path: string | null
     createdAt: Date | null
     completedAt: Date | null
     error_message: string | null
+    userId: string | null
+    bookMetadataId: string | null
   }
 
   export type JobCountAggregateOutputType = {
     id: number
     status: number
+    stage: number
     input_file_path: number
     output_file_path: number
     createdAt: number
     completedAt: number
     error_message: number
+    userId: number
+    bookMetadataId: number
     _all: number
   }
 
@@ -5643,31 +5824,40 @@ export namespace Prisma {
   export type JobMinAggregateInputType = {
     id?: true
     status?: true
+    stage?: true
     input_file_path?: true
     output_file_path?: true
     createdAt?: true
     completedAt?: true
     error_message?: true
+    userId?: true
+    bookMetadataId?: true
   }
 
   export type JobMaxAggregateInputType = {
     id?: true
     status?: true
+    stage?: true
     input_file_path?: true
     output_file_path?: true
     createdAt?: true
     completedAt?: true
     error_message?: true
+    userId?: true
+    bookMetadataId?: true
   }
 
   export type JobCountAggregateInputType = {
     id?: true
     status?: true
+    stage?: true
     input_file_path?: true
     output_file_path?: true
     createdAt?: true
     completedAt?: true
     error_message?: true
+    userId?: true
+    bookMetadataId?: true
     _all?: true
   }
 
@@ -5746,11 +5936,14 @@ export namespace Prisma {
   export type JobGroupByOutputType = {
     id: string
     status: $Enums.JobStatus
+    stage: $Enums.JobStage | null
     input_file_path: string
     output_file_path: string | null
     createdAt: Date
     completedAt: Date | null
     error_message: string | null
+    userId: string
+    bookMetadataId: string | null
     _count: JobCountAggregateOutputType | null
     _min: JobMinAggregateOutputType | null
     _max: JobMaxAggregateOutputType | null
@@ -5773,56 +5966,92 @@ export namespace Prisma {
   export type JobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     status?: boolean
+    stage?: boolean
     input_file_path?: boolean
     output_file_path?: boolean
     createdAt?: boolean
     completedAt?: boolean
     error_message?: boolean
+    userId?: boolean
+    bookMetadataId?: boolean
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     status?: boolean
+    stage?: boolean
     input_file_path?: boolean
     output_file_path?: boolean
     createdAt?: boolean
     completedAt?: boolean
     error_message?: boolean
+    userId?: boolean
+    bookMetadataId?: boolean
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     status?: boolean
+    stage?: boolean
     input_file_path?: boolean
     output_file_path?: boolean
     createdAt?: boolean
     completedAt?: boolean
     error_message?: boolean
+    userId?: boolean
+    bookMetadataId?: boolean
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
   }, ExtArgs["result"]["job"]>
 
   export type JobSelectScalar = {
     id?: boolean
     status?: boolean
+    stage?: boolean
     input_file_path?: boolean
     output_file_path?: boolean
     createdAt?: boolean
     completedAt?: boolean
     error_message?: boolean
+    userId?: boolean
+    bookMetadataId?: boolean
   }
 
-  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "input_file_path" | "output_file_path" | "createdAt" | "completedAt" | "error_message", ExtArgs["result"]["job"]>
+  export type JobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "status" | "stage" | "input_file_path" | "output_file_path" | "createdAt" | "completedAt" | "error_message" | "userId" | "bookMetadataId", ExtArgs["result"]["job"]>
+  export type JobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
+  }
+  export type JobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
+  }
+  export type JobIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    User?: boolean | UserDefaultArgs<ExtArgs>
+    BookMetadata?: boolean | Job$BookMetadataArgs<ExtArgs>
+  }
 
   export type $JobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Job"
-    objects: {}
+    objects: {
+      User: Prisma.$UserPayload<ExtArgs>
+      BookMetadata: Prisma.$BookMetadataPayload<ExtArgs> | null
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       status: $Enums.JobStatus
+      stage: $Enums.JobStage | null
       input_file_path: string
       output_file_path: string | null
       createdAt: Date
       completedAt: Date | null
       error_message: string | null
+      userId: string
+      bookMetadataId: string | null
     }, ExtArgs["result"]["job"]>
     composites: {}
   }
@@ -6217,6 +6446,8 @@ export namespace Prisma {
    */
   export interface Prisma__JobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    User<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    BookMetadata<T extends Job$BookMetadataArgs<ExtArgs> = {}>(args?: Subset<T, Job$BookMetadataArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6248,11 +6479,14 @@ export namespace Prisma {
   interface JobFieldRefs {
     readonly id: FieldRef<"Job", 'String'>
     readonly status: FieldRef<"Job", 'JobStatus'>
+    readonly stage: FieldRef<"Job", 'JobStage'>
     readonly input_file_path: FieldRef<"Job", 'String'>
     readonly output_file_path: FieldRef<"Job", 'String'>
     readonly createdAt: FieldRef<"Job", 'DateTime'>
     readonly completedAt: FieldRef<"Job", 'DateTime'>
     readonly error_message: FieldRef<"Job", 'String'>
+    readonly userId: FieldRef<"Job", 'String'>
+    readonly bookMetadataId: FieldRef<"Job", 'String'>
   }
     
 
@@ -6269,6 +6503,10 @@ export namespace Prisma {
      * Omit specific fields from the Job
      */
     omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
     /**
      * Filter, which Job to fetch.
      */
@@ -6288,6 +6526,10 @@ export namespace Prisma {
      */
     omit?: JobOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    /**
      * Filter, which Job to fetch.
      */
     where: JobWhereUniqueInput
@@ -6305,6 +6547,10 @@ export namespace Prisma {
      * Omit specific fields from the Job
      */
     omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
     /**
      * Filter, which Job to fetch.
      */
@@ -6354,6 +6600,10 @@ export namespace Prisma {
      */
     omit?: JobOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    /**
      * Filter, which Job to fetch.
      */
     where?: JobWhereInput
@@ -6402,6 +6652,10 @@ export namespace Prisma {
      */
     omit?: JobOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    /**
      * Filter, which Jobs to fetch.
      */
     where?: JobWhereInput
@@ -6445,6 +6699,10 @@ export namespace Prisma {
      */
     omit?: JobOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    /**
      * The data needed to create a Job.
      */
     data: XOR<JobCreateInput, JobUncheckedCreateInput>
@@ -6478,6 +6736,10 @@ export namespace Prisma {
      */
     data: JobCreateManyInput | JobCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6492,6 +6754,10 @@ export namespace Prisma {
      * Omit specific fields from the Job
      */
     omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
     /**
      * The data needed to update a Job.
      */
@@ -6544,6 +6810,10 @@ export namespace Prisma {
      * Limit how many Jobs to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6558,6 +6828,10 @@ export namespace Prisma {
      * Omit specific fields from the Job
      */
     omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
     /**
      * The filter to search for the Job to update in case it exists.
      */
@@ -6585,6 +6859,10 @@ export namespace Prisma {
      */
     omit?: JobOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    /**
      * Filter which Job to delete.
      */
     where: JobWhereUniqueInput
@@ -6605,6 +6883,25 @@ export namespace Prisma {
   }
 
   /**
+   * Job.BookMetadata
+   */
+  export type Job$BookMetadataArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    where?: BookMetadataWhereInput
+  }
+
+  /**
    * Job without action
    */
   export type JobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6616,6 +6913,1054 @@ export namespace Prisma {
      * Omit specific fields from the Job
      */
     omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BookMetadata
+   */
+
+  export type AggregateBookMetadata = {
+    _count: BookMetadataCountAggregateOutputType | null
+    _min: BookMetadataMinAggregateOutputType | null
+    _max: BookMetadataMaxAggregateOutputType | null
+  }
+
+  export type BookMetadataMinAggregateOutputType = {
+    id: string | null
+    isbn: string | null
+    cover_url: string | null
+  }
+
+  export type BookMetadataMaxAggregateOutputType = {
+    id: string | null
+    isbn: string | null
+    cover_url: string | null
+  }
+
+  export type BookMetadataCountAggregateOutputType = {
+    id: number
+    isbn: number
+    cover_url: number
+    _all: number
+  }
+
+
+  export type BookMetadataMinAggregateInputType = {
+    id?: true
+    isbn?: true
+    cover_url?: true
+  }
+
+  export type BookMetadataMaxAggregateInputType = {
+    id?: true
+    isbn?: true
+    cover_url?: true
+  }
+
+  export type BookMetadataCountAggregateInputType = {
+    id?: true
+    isbn?: true
+    cover_url?: true
+    _all?: true
+  }
+
+  export type BookMetadataAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BookMetadata to aggregate.
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BookMetadata to fetch.
+     */
+    orderBy?: BookMetadataOrderByWithRelationInput | BookMetadataOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BookMetadataWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BookMetadata from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BookMetadata.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BookMetadata
+    **/
+    _count?: true | BookMetadataCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BookMetadataMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BookMetadataMaxAggregateInputType
+  }
+
+  export type GetBookMetadataAggregateType<T extends BookMetadataAggregateArgs> = {
+        [P in keyof T & keyof AggregateBookMetadata]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBookMetadata[P]>
+      : GetScalarType<T[P], AggregateBookMetadata[P]>
+  }
+
+
+
+
+  export type BookMetadataGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BookMetadataWhereInput
+    orderBy?: BookMetadataOrderByWithAggregationInput | BookMetadataOrderByWithAggregationInput[]
+    by: BookMetadataScalarFieldEnum[] | BookMetadataScalarFieldEnum
+    having?: BookMetadataScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BookMetadataCountAggregateInputType | true
+    _min?: BookMetadataMinAggregateInputType
+    _max?: BookMetadataMaxAggregateInputType
+  }
+
+  export type BookMetadataGroupByOutputType = {
+    id: string
+    isbn: string | null
+    cover_url: string | null
+    _count: BookMetadataCountAggregateOutputType | null
+    _min: BookMetadataMinAggregateOutputType | null
+    _max: BookMetadataMaxAggregateOutputType | null
+  }
+
+  type GetBookMetadataGroupByPayload<T extends BookMetadataGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BookMetadataGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BookMetadataGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BookMetadataGroupByOutputType[P]>
+            : GetScalarType<T[P], BookMetadataGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BookMetadataSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    isbn?: boolean
+    cover_url?: boolean
+    Job?: boolean | BookMetadata$JobArgs<ExtArgs>
+    _count?: boolean | BookMetadataCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["bookMetadata"]>
+
+  export type BookMetadataSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    isbn?: boolean
+    cover_url?: boolean
+  }, ExtArgs["result"]["bookMetadata"]>
+
+  export type BookMetadataSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    isbn?: boolean
+    cover_url?: boolean
+  }, ExtArgs["result"]["bookMetadata"]>
+
+  export type BookMetadataSelectScalar = {
+    id?: boolean
+    isbn?: boolean
+    cover_url?: boolean
+  }
+
+  export type BookMetadataOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "isbn" | "cover_url", ExtArgs["result"]["bookMetadata"]>
+  export type BookMetadataInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    Job?: boolean | BookMetadata$JobArgs<ExtArgs>
+    _count?: boolean | BookMetadataCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type BookMetadataIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type BookMetadataIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $BookMetadataPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BookMetadata"
+    objects: {
+      Job: Prisma.$JobPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      isbn: string | null
+      cover_url: string | null
+    }, ExtArgs["result"]["bookMetadata"]>
+    composites: {}
+  }
+
+  type BookMetadataGetPayload<S extends boolean | null | undefined | BookMetadataDefaultArgs> = $Result.GetResult<Prisma.$BookMetadataPayload, S>
+
+  type BookMetadataCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BookMetadataFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BookMetadataCountAggregateInputType | true
+    }
+
+  export interface BookMetadataDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BookMetadata'], meta: { name: 'BookMetadata' } }
+    /**
+     * Find zero or one BookMetadata that matches the filter.
+     * @param {BookMetadataFindUniqueArgs} args - Arguments to find a BookMetadata
+     * @example
+     * // Get one BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BookMetadataFindUniqueArgs>(args: SelectSubset<T, BookMetadataFindUniqueArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BookMetadata that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BookMetadataFindUniqueOrThrowArgs} args - Arguments to find a BookMetadata
+     * @example
+     * // Get one BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BookMetadataFindUniqueOrThrowArgs>(args: SelectSubset<T, BookMetadataFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BookMetadata that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataFindFirstArgs} args - Arguments to find a BookMetadata
+     * @example
+     * // Get one BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BookMetadataFindFirstArgs>(args?: SelectSubset<T, BookMetadataFindFirstArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BookMetadata that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataFindFirstOrThrowArgs} args - Arguments to find a BookMetadata
+     * @example
+     * // Get one BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BookMetadataFindFirstOrThrowArgs>(args?: SelectSubset<T, BookMetadataFindFirstOrThrowArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BookMetadata that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findMany()
+     * 
+     * // Get first 10 BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const bookMetadataWithIdOnly = await prisma.bookMetadata.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BookMetadataFindManyArgs>(args?: SelectSubset<T, BookMetadataFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BookMetadata.
+     * @param {BookMetadataCreateArgs} args - Arguments to create a BookMetadata.
+     * @example
+     * // Create one BookMetadata
+     * const BookMetadata = await prisma.bookMetadata.create({
+     *   data: {
+     *     // ... data to create a BookMetadata
+     *   }
+     * })
+     * 
+     */
+    create<T extends BookMetadataCreateArgs>(args: SelectSubset<T, BookMetadataCreateArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BookMetadata.
+     * @param {BookMetadataCreateManyArgs} args - Arguments to create many BookMetadata.
+     * @example
+     * // Create many BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BookMetadataCreateManyArgs>(args?: SelectSubset<T, BookMetadataCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BookMetadata and returns the data saved in the database.
+     * @param {BookMetadataCreateManyAndReturnArgs} args - Arguments to create many BookMetadata.
+     * @example
+     * // Create many BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BookMetadata and only return the `id`
+     * const bookMetadataWithIdOnly = await prisma.bookMetadata.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BookMetadataCreateManyAndReturnArgs>(args?: SelectSubset<T, BookMetadataCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BookMetadata.
+     * @param {BookMetadataDeleteArgs} args - Arguments to delete one BookMetadata.
+     * @example
+     * // Delete one BookMetadata
+     * const BookMetadata = await prisma.bookMetadata.delete({
+     *   where: {
+     *     // ... filter to delete one BookMetadata
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BookMetadataDeleteArgs>(args: SelectSubset<T, BookMetadataDeleteArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BookMetadata.
+     * @param {BookMetadataUpdateArgs} args - Arguments to update one BookMetadata.
+     * @example
+     * // Update one BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BookMetadataUpdateArgs>(args: SelectSubset<T, BookMetadataUpdateArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BookMetadata.
+     * @param {BookMetadataDeleteManyArgs} args - Arguments to filter BookMetadata to delete.
+     * @example
+     * // Delete a few BookMetadata
+     * const { count } = await prisma.bookMetadata.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BookMetadataDeleteManyArgs>(args?: SelectSubset<T, BookMetadataDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BookMetadata.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BookMetadataUpdateManyArgs>(args: SelectSubset<T, BookMetadataUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BookMetadata and returns the data updated in the database.
+     * @param {BookMetadataUpdateManyAndReturnArgs} args - Arguments to update many BookMetadata.
+     * @example
+     * // Update many BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BookMetadata and only return the `id`
+     * const bookMetadataWithIdOnly = await prisma.bookMetadata.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BookMetadataUpdateManyAndReturnArgs>(args: SelectSubset<T, BookMetadataUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BookMetadata.
+     * @param {BookMetadataUpsertArgs} args - Arguments to update or create a BookMetadata.
+     * @example
+     * // Update or create a BookMetadata
+     * const bookMetadata = await prisma.bookMetadata.upsert({
+     *   create: {
+     *     // ... data to create a BookMetadata
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BookMetadata we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BookMetadataUpsertArgs>(args: SelectSubset<T, BookMetadataUpsertArgs<ExtArgs>>): Prisma__BookMetadataClient<$Result.GetResult<Prisma.$BookMetadataPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BookMetadata.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataCountArgs} args - Arguments to filter BookMetadata to count.
+     * @example
+     * // Count the number of BookMetadata
+     * const count = await prisma.bookMetadata.count({
+     *   where: {
+     *     // ... the filter for the BookMetadata we want to count
+     *   }
+     * })
+    **/
+    count<T extends BookMetadataCountArgs>(
+      args?: Subset<T, BookMetadataCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BookMetadataCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BookMetadata.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BookMetadataAggregateArgs>(args: Subset<T, BookMetadataAggregateArgs>): Prisma.PrismaPromise<GetBookMetadataAggregateType<T>>
+
+    /**
+     * Group by BookMetadata.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BookMetadataGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BookMetadataGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BookMetadataGroupByArgs['orderBy'] }
+        : { orderBy?: BookMetadataGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BookMetadataGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBookMetadataGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BookMetadata model
+   */
+  readonly fields: BookMetadataFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BookMetadata.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BookMetadataClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    Job<T extends BookMetadata$JobArgs<ExtArgs> = {}>(args?: Subset<T, BookMetadata$JobArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$JobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BookMetadata model
+   */
+  interface BookMetadataFieldRefs {
+    readonly id: FieldRef<"BookMetadata", 'String'>
+    readonly isbn: FieldRef<"BookMetadata", 'String'>
+    readonly cover_url: FieldRef<"BookMetadata", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BookMetadata findUnique
+   */
+  export type BookMetadataFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter, which BookMetadata to fetch.
+     */
+    where: BookMetadataWhereUniqueInput
+  }
+
+  /**
+   * BookMetadata findUniqueOrThrow
+   */
+  export type BookMetadataFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter, which BookMetadata to fetch.
+     */
+    where: BookMetadataWhereUniqueInput
+  }
+
+  /**
+   * BookMetadata findFirst
+   */
+  export type BookMetadataFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter, which BookMetadata to fetch.
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BookMetadata to fetch.
+     */
+    orderBy?: BookMetadataOrderByWithRelationInput | BookMetadataOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BookMetadata.
+     */
+    cursor?: BookMetadataWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BookMetadata from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BookMetadata.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BookMetadata.
+     */
+    distinct?: BookMetadataScalarFieldEnum | BookMetadataScalarFieldEnum[]
+  }
+
+  /**
+   * BookMetadata findFirstOrThrow
+   */
+  export type BookMetadataFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter, which BookMetadata to fetch.
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BookMetadata to fetch.
+     */
+    orderBy?: BookMetadataOrderByWithRelationInput | BookMetadataOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BookMetadata.
+     */
+    cursor?: BookMetadataWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BookMetadata from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BookMetadata.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BookMetadata.
+     */
+    distinct?: BookMetadataScalarFieldEnum | BookMetadataScalarFieldEnum[]
+  }
+
+  /**
+   * BookMetadata findMany
+   */
+  export type BookMetadataFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter, which BookMetadata to fetch.
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BookMetadata to fetch.
+     */
+    orderBy?: BookMetadataOrderByWithRelationInput | BookMetadataOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BookMetadata.
+     */
+    cursor?: BookMetadataWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BookMetadata from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BookMetadata.
+     */
+    skip?: number
+    distinct?: BookMetadataScalarFieldEnum | BookMetadataScalarFieldEnum[]
+  }
+
+  /**
+   * BookMetadata create
+   */
+  export type BookMetadataCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BookMetadata.
+     */
+    data?: XOR<BookMetadataCreateInput, BookMetadataUncheckedCreateInput>
+  }
+
+  /**
+   * BookMetadata createMany
+   */
+  export type BookMetadataCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BookMetadata.
+     */
+    data: BookMetadataCreateManyInput | BookMetadataCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BookMetadata createManyAndReturn
+   */
+  export type BookMetadataCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * The data used to create many BookMetadata.
+     */
+    data: BookMetadataCreateManyInput | BookMetadataCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BookMetadata update
+   */
+  export type BookMetadataUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BookMetadata.
+     */
+    data: XOR<BookMetadataUpdateInput, BookMetadataUncheckedUpdateInput>
+    /**
+     * Choose, which BookMetadata to update.
+     */
+    where: BookMetadataWhereUniqueInput
+  }
+
+  /**
+   * BookMetadata updateMany
+   */
+  export type BookMetadataUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BookMetadata.
+     */
+    data: XOR<BookMetadataUpdateManyMutationInput, BookMetadataUncheckedUpdateManyInput>
+    /**
+     * Filter which BookMetadata to update
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * Limit how many BookMetadata to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BookMetadata updateManyAndReturn
+   */
+  export type BookMetadataUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * The data used to update BookMetadata.
+     */
+    data: XOR<BookMetadataUpdateManyMutationInput, BookMetadataUncheckedUpdateManyInput>
+    /**
+     * Filter which BookMetadata to update
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * Limit how many BookMetadata to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BookMetadata upsert
+   */
+  export type BookMetadataUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BookMetadata to update in case it exists.
+     */
+    where: BookMetadataWhereUniqueInput
+    /**
+     * In case the BookMetadata found by the `where` argument doesn't exist, create a new BookMetadata with this data.
+     */
+    create: XOR<BookMetadataCreateInput, BookMetadataUncheckedCreateInput>
+    /**
+     * In case the BookMetadata was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BookMetadataUpdateInput, BookMetadataUncheckedUpdateInput>
+  }
+
+  /**
+   * BookMetadata delete
+   */
+  export type BookMetadataDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
+    /**
+     * Filter which BookMetadata to delete.
+     */
+    where: BookMetadataWhereUniqueInput
+  }
+
+  /**
+   * BookMetadata deleteMany
+   */
+  export type BookMetadataDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BookMetadata to delete
+     */
+    where?: BookMetadataWhereInput
+    /**
+     * Limit how many BookMetadata to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BookMetadata.Job
+   */
+  export type BookMetadata$JobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Job
+     */
+    select?: JobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Job
+     */
+    omit?: JobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: JobInclude<ExtArgs> | null
+    where?: JobWhereInput
+    orderBy?: JobOrderByWithRelationInput | JobOrderByWithRelationInput[]
+    cursor?: JobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: JobScalarFieldEnum | JobScalarFieldEnum[]
+  }
+
+  /**
+   * BookMetadata without action
+   */
+  export type BookMetadataDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BookMetadata
+     */
+    select?: BookMetadataSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BookMetadata
+     */
+    omit?: BookMetadataOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BookMetadataInclude<ExtArgs> | null
   }
 
 
@@ -6690,14 +8035,26 @@ export namespace Prisma {
   export const JobScalarFieldEnum: {
     id: 'id',
     status: 'status',
+    stage: 'stage',
     input_file_path: 'input_file_path',
     output_file_path: 'output_file_path',
     createdAt: 'createdAt',
     completedAt: 'completedAt',
-    error_message: 'error_message'
+    error_message: 'error_message',
+    userId: 'userId',
+    bookMetadataId: 'bookMetadataId'
   };
 
   export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobScalarFieldEnum]
+
+
+  export const BookMetadataScalarFieldEnum: {
+    id: 'id',
+    isbn: 'isbn',
+    cover_url: 'cover_url'
+  };
+
+  export type BookMetadataScalarFieldEnum = (typeof BookMetadataScalarFieldEnum)[keyof typeof BookMetadataScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -6786,6 +8143,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'JobStage'
+   */
+  export type EnumJobStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobStage'>
+    
+
+
+  /**
+   * Reference to a field of type 'JobStage[]'
+   */
+  export type ListEnumJobStageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JobStage[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -6816,6 +8187,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
+    jobs?: JobListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -6829,6 +8201,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     accounts?: AccountOrderByRelationAggregateInput
+    jobs?: JobOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -6845,6 +8218,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     accounts?: AccountListRelationFilter
+    jobs?: JobListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -7079,21 +8453,31 @@ export namespace Prisma {
     NOT?: JobWhereInput | JobWhereInput[]
     id?: UuidFilter<"Job"> | string
     status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    stage?: EnumJobStageNullableFilter<"Job"> | $Enums.JobStage | null
     input_file_path?: StringFilter<"Job"> | string
     output_file_path?: StringNullableFilter<"Job"> | string | null
     createdAt?: DateTimeFilter<"Job"> | Date | string
     completedAt?: DateTimeNullableFilter<"Job"> | Date | string | null
     error_message?: StringNullableFilter<"Job"> | string | null
+    userId?: StringFilter<"Job"> | string
+    bookMetadataId?: UuidNullableFilter<"Job"> | string | null
+    User?: XOR<UserScalarRelationFilter, UserWhereInput>
+    BookMetadata?: XOR<BookMetadataNullableScalarRelationFilter, BookMetadataWhereInput> | null
   }
 
   export type JobOrderByWithRelationInput = {
     id?: SortOrder
     status?: SortOrder
+    stage?: SortOrderInput | SortOrder
     input_file_path?: SortOrder
     output_file_path?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     error_message?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    bookMetadataId?: SortOrderInput | SortOrder
+    User?: UserOrderByWithRelationInput
+    BookMetadata?: BookMetadataOrderByWithRelationInput
   }
 
   export type JobWhereUniqueInput = Prisma.AtLeast<{
@@ -7102,21 +8486,29 @@ export namespace Prisma {
     OR?: JobWhereInput[]
     NOT?: JobWhereInput | JobWhereInput[]
     status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    stage?: EnumJobStageNullableFilter<"Job"> | $Enums.JobStage | null
     input_file_path?: StringFilter<"Job"> | string
     output_file_path?: StringNullableFilter<"Job"> | string | null
     createdAt?: DateTimeFilter<"Job"> | Date | string
     completedAt?: DateTimeNullableFilter<"Job"> | Date | string | null
     error_message?: StringNullableFilter<"Job"> | string | null
+    userId?: StringFilter<"Job"> | string
+    bookMetadataId?: UuidNullableFilter<"Job"> | string | null
+    User?: XOR<UserScalarRelationFilter, UserWhereInput>
+    BookMetadata?: XOR<BookMetadataNullableScalarRelationFilter, BookMetadataWhereInput> | null
   }, "id">
 
   export type JobOrderByWithAggregationInput = {
     id?: SortOrder
     status?: SortOrder
+    stage?: SortOrderInput | SortOrder
     input_file_path?: SortOrder
     output_file_path?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     error_message?: SortOrderInput | SortOrder
+    userId?: SortOrder
+    bookMetadataId?: SortOrderInput | SortOrder
     _count?: JobCountOrderByAggregateInput
     _max?: JobMaxOrderByAggregateInput
     _min?: JobMinOrderByAggregateInput
@@ -7128,11 +8520,59 @@ export namespace Prisma {
     NOT?: JobScalarWhereWithAggregatesInput | JobScalarWhereWithAggregatesInput[]
     id?: UuidWithAggregatesFilter<"Job"> | string
     status?: EnumJobStatusWithAggregatesFilter<"Job"> | $Enums.JobStatus
+    stage?: EnumJobStageNullableWithAggregatesFilter<"Job"> | $Enums.JobStage | null
     input_file_path?: StringWithAggregatesFilter<"Job"> | string
     output_file_path?: StringNullableWithAggregatesFilter<"Job"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Job"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"Job"> | Date | string | null
     error_message?: StringNullableWithAggregatesFilter<"Job"> | string | null
+    userId?: StringWithAggregatesFilter<"Job"> | string
+    bookMetadataId?: UuidNullableWithAggregatesFilter<"Job"> | string | null
+  }
+
+  export type BookMetadataWhereInput = {
+    AND?: BookMetadataWhereInput | BookMetadataWhereInput[]
+    OR?: BookMetadataWhereInput[]
+    NOT?: BookMetadataWhereInput | BookMetadataWhereInput[]
+    id?: UuidFilter<"BookMetadata"> | string
+    isbn?: StringNullableFilter<"BookMetadata"> | string | null
+    cover_url?: StringNullableFilter<"BookMetadata"> | string | null
+    Job?: JobListRelationFilter
+  }
+
+  export type BookMetadataOrderByWithRelationInput = {
+    id?: SortOrder
+    isbn?: SortOrderInput | SortOrder
+    cover_url?: SortOrderInput | SortOrder
+    Job?: JobOrderByRelationAggregateInput
+  }
+
+  export type BookMetadataWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BookMetadataWhereInput | BookMetadataWhereInput[]
+    OR?: BookMetadataWhereInput[]
+    NOT?: BookMetadataWhereInput | BookMetadataWhereInput[]
+    isbn?: StringNullableFilter<"BookMetadata"> | string | null
+    cover_url?: StringNullableFilter<"BookMetadata"> | string | null
+    Job?: JobListRelationFilter
+  }, "id">
+
+  export type BookMetadataOrderByWithAggregationInput = {
+    id?: SortOrder
+    isbn?: SortOrderInput | SortOrder
+    cover_url?: SortOrderInput | SortOrder
+    _count?: BookMetadataCountOrderByAggregateInput
+    _max?: BookMetadataMaxOrderByAggregateInput
+    _min?: BookMetadataMinOrderByAggregateInput
+  }
+
+  export type BookMetadataScalarWhereWithAggregatesInput = {
+    AND?: BookMetadataScalarWhereWithAggregatesInput | BookMetadataScalarWhereWithAggregatesInput[]
+    OR?: BookMetadataScalarWhereWithAggregatesInput[]
+    NOT?: BookMetadataScalarWhereWithAggregatesInput | BookMetadataScalarWhereWithAggregatesInput[]
+    id?: UuidWithAggregatesFilter<"BookMetadata"> | string
+    isbn?: StringNullableWithAggregatesFilter<"BookMetadata"> | string | null
+    cover_url?: StringNullableWithAggregatesFilter<"BookMetadata"> | string | null
   }
 
   export type UserCreateInput = {
@@ -7146,6 +8586,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountCreateNestedManyWithoutUserInput
+    jobs?: JobCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -7159,6 +8600,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    jobs?: JobUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -7172,6 +8614,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUpdateManyWithoutUserNestedInput
+    jobs?: JobUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -7185,6 +8628,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    jobs?: JobUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -7435,56 +8879,72 @@ export namespace Prisma {
   export type JobCreateInput = {
     id?: string
     status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
     input_file_path: string
     output_file_path?: string | null
     createdAt?: Date | string
     completedAt?: Date | string | null
     error_message?: string | null
+    User: UserCreateNestedOneWithoutJobsInput
+    BookMetadata?: BookMetadataCreateNestedOneWithoutJobInput
   }
 
   export type JobUncheckedCreateInput = {
     id?: string
     status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
     input_file_path: string
     output_file_path?: string | null
     createdAt?: Date | string
     completedAt?: Date | string | null
     error_message?: string | null
+    userId: string
+    bookMetadataId?: string | null
   }
 
   export type JobUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
     input_file_path?: StringFieldUpdateOperationsInput | string
     output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    User?: UserUpdateOneRequiredWithoutJobsNestedInput
+    BookMetadata?: BookMetadataUpdateOneWithoutJobNestedInput
   }
 
   export type JobUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
     input_file_path?: StringFieldUpdateOperationsInput | string
     output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    bookMetadataId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type JobCreateManyInput = {
     id?: string
     status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
     input_file_path: string
     output_file_path?: string | null
     createdAt?: Date | string
     completedAt?: Date | string | null
     error_message?: string | null
+    userId: string
+    bookMetadataId?: string | null
   }
 
   export type JobUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
     input_file_path?: StringFieldUpdateOperationsInput | string
     output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -7495,11 +8955,60 @@ export namespace Prisma {
   export type JobUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
     input_file_path?: StringFieldUpdateOperationsInput | string
     output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+    bookMetadataId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BookMetadataCreateInput = {
+    id?: string
+    isbn?: string | null
+    cover_url?: string | null
+    Job?: JobCreateNestedManyWithoutBookMetadataInput
+  }
+
+  export type BookMetadataUncheckedCreateInput = {
+    id?: string
+    isbn?: string | null
+    cover_url?: string | null
+    Job?: JobUncheckedCreateNestedManyWithoutBookMetadataInput
+  }
+
+  export type BookMetadataUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
+    Job?: JobUpdateManyWithoutBookMetadataNestedInput
+  }
+
+  export type BookMetadataUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
+    Job?: JobUncheckedUpdateManyWithoutBookMetadataNestedInput
+  }
+
+  export type BookMetadataCreateManyInput = {
+    id?: string
+    isbn?: string | null
+    cover_url?: string | null
+  }
+
+  export type BookMetadataUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BookMetadataUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -7571,12 +9080,22 @@ export namespace Prisma {
     none?: AccountWhereInput
   }
 
+  export type JobListRelationFilter = {
+    every?: JobWhereInput
+    some?: JobWhereInput
+    none?: JobWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
   }
 
   export type AccountOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type JobOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -7868,34 +9387,67 @@ export namespace Prisma {
     not?: NestedEnumJobStatusFilter<$PrismaModel> | $Enums.JobStatus
   }
 
+  export type EnumJobStageNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobStage | EnumJobStageFieldRefInput<$PrismaModel> | null
+    in?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumJobStageNullableFilter<$PrismaModel> | $Enums.JobStage | null
+  }
+
+  export type UuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type BookMetadataNullableScalarRelationFilter = {
+    is?: BookMetadataWhereInput | null
+    isNot?: BookMetadataWhereInput | null
+  }
+
   export type JobCountOrderByAggregateInput = {
     id?: SortOrder
     status?: SortOrder
+    stage?: SortOrder
     input_file_path?: SortOrder
     output_file_path?: SortOrder
     createdAt?: SortOrder
     completedAt?: SortOrder
     error_message?: SortOrder
+    userId?: SortOrder
+    bookMetadataId?: SortOrder
   }
 
   export type JobMaxOrderByAggregateInput = {
     id?: SortOrder
     status?: SortOrder
+    stage?: SortOrder
     input_file_path?: SortOrder
     output_file_path?: SortOrder
     createdAt?: SortOrder
     completedAt?: SortOrder
     error_message?: SortOrder
+    userId?: SortOrder
+    bookMetadataId?: SortOrder
   }
 
   export type JobMinOrderByAggregateInput = {
     id?: SortOrder
     status?: SortOrder
+    stage?: SortOrder
     input_file_path?: SortOrder
     output_file_path?: SortOrder
     createdAt?: SortOrder
     completedAt?: SortOrder
     error_message?: SortOrder
+    userId?: SortOrder
+    bookMetadataId?: SortOrder
   }
 
   export type UuidWithAggregatesFilter<$PrismaModel = never> = {
@@ -7923,6 +9475,49 @@ export namespace Prisma {
     _max?: NestedEnumJobStatusFilter<$PrismaModel>
   }
 
+  export type EnumJobStageNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobStage | EnumJobStageFieldRefInput<$PrismaModel> | null
+    in?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumJobStageNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobStage | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumJobStageNullableFilter<$PrismaModel>
+    _max?: NestedEnumJobStageNullableFilter<$PrismaModel>
+  }
+
+  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type BookMetadataCountOrderByAggregateInput = {
+    id?: SortOrder
+    isbn?: SortOrder
+    cover_url?: SortOrder
+  }
+
+  export type BookMetadataMaxOrderByAggregateInput = {
+    id?: SortOrder
+    isbn?: SortOrder
+    cover_url?: SortOrder
+  }
+
+  export type BookMetadataMinOrderByAggregateInput = {
+    id?: SortOrder
+    isbn?: SortOrder
+    cover_url?: SortOrder
+  }
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -7930,11 +9525,25 @@ export namespace Prisma {
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
   }
 
+  export type JobCreateNestedManyWithoutUserInput = {
+    create?: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput> | JobCreateWithoutUserInput[] | JobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutUserInput | JobCreateOrConnectWithoutUserInput[]
+    createMany?: JobCreateManyUserInputEnvelope
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
     createMany?: AccountCreateManyUserInputEnvelope
     connect?: AccountWhereUniqueInput | AccountWhereUniqueInput[]
+  }
+
+  export type JobUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput> | JobCreateWithoutUserInput[] | JobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutUserInput | JobCreateOrConnectWithoutUserInput[]
+    createMany?: JobCreateManyUserInputEnvelope
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -7975,6 +9584,20 @@ export namespace Prisma {
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
   }
 
+  export type JobUpdateManyWithoutUserNestedInput = {
+    create?: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput> | JobCreateWithoutUserInput[] | JobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutUserInput | JobCreateOrConnectWithoutUserInput[]
+    upsert?: JobUpsertWithWhereUniqueWithoutUserInput | JobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: JobCreateManyUserInputEnvelope
+    set?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    disconnect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    delete?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    update?: JobUpdateWithWhereUniqueWithoutUserInput | JobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: JobUpdateManyWithWhereWithoutUserInput | JobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: JobScalarWhereInput | JobScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -7987,6 +9610,20 @@ export namespace Prisma {
     update?: AccountUpdateWithWhereUniqueWithoutUserInput | AccountUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AccountUpdateManyWithWhereWithoutUserInput | AccountUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AccountScalarWhereInput | AccountScalarWhereInput[]
+  }
+
+  export type JobUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput> | JobCreateWithoutUserInput[] | JobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutUserInput | JobCreateOrConnectWithoutUserInput[]
+    upsert?: JobUpsertWithWhereUniqueWithoutUserInput | JobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: JobCreateManyUserInputEnvelope
+    set?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    disconnect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    delete?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    update?: JobUpdateWithWhereUniqueWithoutUserInput | JobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: JobUpdateManyWithWhereWithoutUserInput | JobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: JobScalarWhereInput | JobScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAccountsInput = {
@@ -8011,8 +9648,84 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAccountsInput, UserUpdateWithoutAccountsInput>, UserUncheckedUpdateWithoutAccountsInput>
   }
 
+  export type UserCreateNestedOneWithoutJobsInput = {
+    create?: XOR<UserCreateWithoutJobsInput, UserUncheckedCreateWithoutJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type BookMetadataCreateNestedOneWithoutJobInput = {
+    create?: XOR<BookMetadataCreateWithoutJobInput, BookMetadataUncheckedCreateWithoutJobInput>
+    connectOrCreate?: BookMetadataCreateOrConnectWithoutJobInput
+    connect?: BookMetadataWhereUniqueInput
+  }
+
   export type EnumJobStatusFieldUpdateOperationsInput = {
     set?: $Enums.JobStatus
+  }
+
+  export type NullableEnumJobStageFieldUpdateOperationsInput = {
+    set?: $Enums.JobStage | null
+  }
+
+  export type UserUpdateOneRequiredWithoutJobsNestedInput = {
+    create?: XOR<UserCreateWithoutJobsInput, UserUncheckedCreateWithoutJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutJobsInput
+    upsert?: UserUpsertWithoutJobsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutJobsInput, UserUpdateWithoutJobsInput>, UserUncheckedUpdateWithoutJobsInput>
+  }
+
+  export type BookMetadataUpdateOneWithoutJobNestedInput = {
+    create?: XOR<BookMetadataCreateWithoutJobInput, BookMetadataUncheckedCreateWithoutJobInput>
+    connectOrCreate?: BookMetadataCreateOrConnectWithoutJobInput
+    upsert?: BookMetadataUpsertWithoutJobInput
+    disconnect?: BookMetadataWhereInput | boolean
+    delete?: BookMetadataWhereInput | boolean
+    connect?: BookMetadataWhereUniqueInput
+    update?: XOR<XOR<BookMetadataUpdateToOneWithWhereWithoutJobInput, BookMetadataUpdateWithoutJobInput>, BookMetadataUncheckedUpdateWithoutJobInput>
+  }
+
+  export type JobCreateNestedManyWithoutBookMetadataInput = {
+    create?: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput> | JobCreateWithoutBookMetadataInput[] | JobUncheckedCreateWithoutBookMetadataInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutBookMetadataInput | JobCreateOrConnectWithoutBookMetadataInput[]
+    createMany?: JobCreateManyBookMetadataInputEnvelope
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+  }
+
+  export type JobUncheckedCreateNestedManyWithoutBookMetadataInput = {
+    create?: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput> | JobCreateWithoutBookMetadataInput[] | JobUncheckedCreateWithoutBookMetadataInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutBookMetadataInput | JobCreateOrConnectWithoutBookMetadataInput[]
+    createMany?: JobCreateManyBookMetadataInputEnvelope
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+  }
+
+  export type JobUpdateManyWithoutBookMetadataNestedInput = {
+    create?: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput> | JobCreateWithoutBookMetadataInput[] | JobUncheckedCreateWithoutBookMetadataInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutBookMetadataInput | JobCreateOrConnectWithoutBookMetadataInput[]
+    upsert?: JobUpsertWithWhereUniqueWithoutBookMetadataInput | JobUpsertWithWhereUniqueWithoutBookMetadataInput[]
+    createMany?: JobCreateManyBookMetadataInputEnvelope
+    set?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    disconnect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    delete?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    update?: JobUpdateWithWhereUniqueWithoutBookMetadataInput | JobUpdateWithWhereUniqueWithoutBookMetadataInput[]
+    updateMany?: JobUpdateManyWithWhereWithoutBookMetadataInput | JobUpdateManyWithWhereWithoutBookMetadataInput[]
+    deleteMany?: JobScalarWhereInput | JobScalarWhereInput[]
+  }
+
+  export type JobUncheckedUpdateManyWithoutBookMetadataNestedInput = {
+    create?: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput> | JobCreateWithoutBookMetadataInput[] | JobUncheckedCreateWithoutBookMetadataInput[]
+    connectOrCreate?: JobCreateOrConnectWithoutBookMetadataInput | JobCreateOrConnectWithoutBookMetadataInput[]
+    upsert?: JobUpsertWithWhereUniqueWithoutBookMetadataInput | JobUpsertWithWhereUniqueWithoutBookMetadataInput[]
+    createMany?: JobCreateManyBookMetadataInputEnvelope
+    set?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    disconnect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    delete?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    connect?: JobWhereUniqueInput | JobWhereUniqueInput[]
+    update?: JobUpdateWithWhereUniqueWithoutBookMetadataInput | JobUpdateWithWhereUniqueWithoutBookMetadataInput[]
+    updateMany?: JobUpdateManyWithWhereWithoutBookMetadataInput | JobUpdateManyWithWhereWithoutBookMetadataInput[]
+    deleteMany?: JobScalarWhereInput | JobScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -8221,6 +9934,24 @@ export namespace Prisma {
     not?: NestedEnumJobStatusFilter<$PrismaModel> | $Enums.JobStatus
   }
 
+  export type NestedEnumJobStageNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobStage | EnumJobStageFieldRefInput<$PrismaModel> | null
+    in?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumJobStageNullableFilter<$PrismaModel> | $Enums.JobStage | null
+  }
+
+  export type NestedUuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedUuidWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -8243,6 +9974,30 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumJobStatusFilter<$PrismaModel>
     _max?: NestedEnumJobStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumJobStageNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.JobStage | EnumJobStageFieldRefInput<$PrismaModel> | null
+    in?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.JobStage[] | ListEnumJobStageFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumJobStageNullableWithAggregatesFilter<$PrismaModel> | $Enums.JobStage | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumJobStageNullableFilter<$PrismaModel>
+    _max?: NestedEnumJobStageNullableFilter<$PrismaModel>
+  }
+
+  export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -8285,6 +10040,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type JobCreateWithoutUserInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    BookMetadata?: BookMetadataCreateNestedOneWithoutJobInput
+  }
+
+  export type JobUncheckedCreateWithoutUserInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    bookMetadataId?: string | null
+  }
+
+  export type JobCreateOrConnectWithoutUserInput = {
+    where: JobWhereUniqueInput
+    create: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput>
+  }
+
+  export type JobCreateManyUserInputEnvelope = {
+    data: JobCreateManyUserInput | JobCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
     where: AccountWhereUniqueInput
     update: XOR<AccountUpdateWithoutUserInput, AccountUncheckedUpdateWithoutUserInput>
@@ -8320,6 +10109,38 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Account"> | Date | string
   }
 
+  export type JobUpsertWithWhereUniqueWithoutUserInput = {
+    where: JobWhereUniqueInput
+    update: XOR<JobUpdateWithoutUserInput, JobUncheckedUpdateWithoutUserInput>
+    create: XOR<JobCreateWithoutUserInput, JobUncheckedCreateWithoutUserInput>
+  }
+
+  export type JobUpdateWithWhereUniqueWithoutUserInput = {
+    where: JobWhereUniqueInput
+    data: XOR<JobUpdateWithoutUserInput, JobUncheckedUpdateWithoutUserInput>
+  }
+
+  export type JobUpdateManyWithWhereWithoutUserInput = {
+    where: JobScalarWhereInput
+    data: XOR<JobUpdateManyMutationInput, JobUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type JobScalarWhereInput = {
+    AND?: JobScalarWhereInput | JobScalarWhereInput[]
+    OR?: JobScalarWhereInput[]
+    NOT?: JobScalarWhereInput | JobScalarWhereInput[]
+    id?: UuidFilter<"Job"> | string
+    status?: EnumJobStatusFilter<"Job"> | $Enums.JobStatus
+    stage?: EnumJobStageNullableFilter<"Job"> | $Enums.JobStage | null
+    input_file_path?: StringFilter<"Job"> | string
+    output_file_path?: StringNullableFilter<"Job"> | string | null
+    createdAt?: DateTimeFilter<"Job"> | Date | string
+    completedAt?: DateTimeNullableFilter<"Job"> | Date | string | null
+    error_message?: StringNullableFilter<"Job"> | string | null
+    userId?: StringFilter<"Job"> | string
+    bookMetadataId?: UuidNullableFilter<"Job"> | string | null
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -8330,6 +10151,7 @@ export namespace Prisma {
     credits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobs?: JobCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -8342,6 +10164,7 @@ export namespace Prisma {
     credits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    jobs?: JobUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -8370,6 +10193,7 @@ export namespace Prisma {
     credits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobs?: JobUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -8382,6 +10206,165 @@ export namespace Prisma {
     credits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jobs?: JobUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    password?: string | null
+    image?: string | null
+    credits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    password?: string | null
+    image?: string | null
+    credits?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutJobsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutJobsInput, UserUncheckedCreateWithoutJobsInput>
+  }
+
+  export type BookMetadataCreateWithoutJobInput = {
+    id?: string
+    isbn?: string | null
+    cover_url?: string | null
+  }
+
+  export type BookMetadataUncheckedCreateWithoutJobInput = {
+    id?: string
+    isbn?: string | null
+    cover_url?: string | null
+  }
+
+  export type BookMetadataCreateOrConnectWithoutJobInput = {
+    where: BookMetadataWhereUniqueInput
+    create: XOR<BookMetadataCreateWithoutJobInput, BookMetadataUncheckedCreateWithoutJobInput>
+  }
+
+  export type UserUpsertWithoutJobsInput = {
+    update: XOR<UserUpdateWithoutJobsInput, UserUncheckedUpdateWithoutJobsInput>
+    create: XOR<UserCreateWithoutJobsInput, UserUncheckedCreateWithoutJobsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutJobsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutJobsInput, UserUncheckedUpdateWithoutJobsInput>
+  }
+
+  export type UserUpdateWithoutJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    credits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    credits?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type BookMetadataUpsertWithoutJobInput = {
+    update: XOR<BookMetadataUpdateWithoutJobInput, BookMetadataUncheckedUpdateWithoutJobInput>
+    create: XOR<BookMetadataCreateWithoutJobInput, BookMetadataUncheckedCreateWithoutJobInput>
+    where?: BookMetadataWhereInput
+  }
+
+  export type BookMetadataUpdateToOneWithWhereWithoutJobInput = {
+    where?: BookMetadataWhereInput
+    data: XOR<BookMetadataUpdateWithoutJobInput, BookMetadataUncheckedUpdateWithoutJobInput>
+  }
+
+  export type BookMetadataUpdateWithoutJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type BookMetadataUncheckedUpdateWithoutJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    isbn?: NullableStringFieldUpdateOperationsInput | string | null
+    cover_url?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JobCreateWithoutBookMetadataInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    User: UserCreateNestedOneWithoutJobsInput
+  }
+
+  export type JobUncheckedCreateWithoutBookMetadataInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    userId: string
+  }
+
+  export type JobCreateOrConnectWithoutBookMetadataInput = {
+    where: JobWhereUniqueInput
+    create: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput>
+  }
+
+  export type JobCreateManyBookMetadataInputEnvelope = {
+    data: JobCreateManyBookMetadataInput | JobCreateManyBookMetadataInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type JobUpsertWithWhereUniqueWithoutBookMetadataInput = {
+    where: JobWhereUniqueInput
+    update: XOR<JobUpdateWithoutBookMetadataInput, JobUncheckedUpdateWithoutBookMetadataInput>
+    create: XOR<JobCreateWithoutBookMetadataInput, JobUncheckedCreateWithoutBookMetadataInput>
+  }
+
+  export type JobUpdateWithWhereUniqueWithoutBookMetadataInput = {
+    where: JobWhereUniqueInput
+    data: XOR<JobUpdateWithoutBookMetadataInput, JobUncheckedUpdateWithoutBookMetadataInput>
+  }
+
+  export type JobUpdateManyWithWhereWithoutBookMetadataInput = {
+    where: JobScalarWhereInput
+    data: XOR<JobUpdateManyMutationInput, JobUncheckedUpdateManyWithoutBookMetadataInput>
   }
 
   export type AccountCreateManyUserInput = {
@@ -8397,6 +10380,18 @@ export namespace Prisma {
     session_state?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type JobCreateManyUserInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    bookMetadataId?: string | null
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -8442,6 +10437,90 @@ export namespace Prisma {
     session_state?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type JobUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    BookMetadata?: BookMetadataUpdateOneWithoutJobNestedInput
+  }
+
+  export type JobUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    bookMetadataId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JobUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    bookMetadataId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type JobCreateManyBookMetadataInput = {
+    id?: string
+    status?: $Enums.JobStatus
+    stage?: $Enums.JobStage | null
+    input_file_path: string
+    output_file_path?: string | null
+    createdAt?: Date | string
+    completedAt?: Date | string | null
+    error_message?: string | null
+    userId: string
+  }
+
+  export type JobUpdateWithoutBookMetadataInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    User?: UserUpdateOneRequiredWithoutJobsNestedInput
+  }
+
+  export type JobUncheckedUpdateWithoutBookMetadataInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type JobUncheckedUpdateManyWithoutBookMetadataInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
+    stage?: NullableEnumJobStageFieldUpdateOperationsInput | $Enums.JobStage | null
+    input_file_path?: StringFieldUpdateOperationsInput | string
+    output_file_path?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    error_message?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
 

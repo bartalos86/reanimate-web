@@ -57,6 +57,10 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    if (!session.user.id) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const conversionType = formData.get("conversionType") as "epub" | "markdown";
@@ -93,8 +97,8 @@ export async function POST(request: Request) {
 
     // Save files
     const pdfPath = await saveFile(file, "uploads", pdfFilename);
-    let coverPath = null;
-
+    let coverPath = "";
+    // coverPath is not used, so we skip assigning it
     if (coverImage) {
       coverPath = await saveFile(coverImage, "covers", coverFilename!);
     }
@@ -110,6 +114,7 @@ export async function POST(request: Request) {
 
     const databaseJob = await prisma.job.create({
       data: {
+        userId: session.user.id,
         input_file_path: fullPdfPath,
         status: JobStatus.PENDING
       }
@@ -127,7 +132,8 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         id: databaseJob.id,
         automatic_metadata: metadataMode === "auto",
-        metadata
+        metadata,
+        cover_image_path: coverPath
       }),
     });
 

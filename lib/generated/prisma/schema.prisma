@@ -24,6 +24,7 @@ model User {
   image         String?
   credits       Int       @default(0)
   accounts      Account[]
+  jobs          Job[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -69,15 +70,35 @@ model PasswordResetToken {
 }
 
 model Job {
-  id               String    @id @default(uuid()) @db.Uuid
-  status           JobStatus @default(PENDING)
+  id               String        @id @default(uuid()) @db.Uuid
+  status           JobStatus     @default(PENDING)
+  stage            JobStage?
   input_file_path  String
   output_file_path String?
-  createdAt        DateTime  @default(now())
+  createdAt        DateTime      @default(now())
   completedAt      DateTime?
-  error_message    String?   @map("error_message")
+  error_message    String?
+  User             User          @relation(fields: [userId], references: [id])
+  userId           String
+  bookMetadataId   String?       @db.Uuid
+  BookMetadata     BookMetadata? @relation(fields: [bookMetadataId], references: [id])
 
   @@map("jobs")
+}
+
+model BookMetadata {
+  id        String  @id @default(uuid()) @db.Uuid
+  isbn      String?
+  cover_url String?
+  Job       Job[]
+
+  @@map("BookMetadata")
+}
+
+enum JobStage {
+  OCR
+  METADATA
+  CONVERSION
 }
 
 enum JobStatus {
